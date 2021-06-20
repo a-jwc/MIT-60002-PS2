@@ -123,22 +123,23 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
         #     # raise ValueError("Could not find nodes")
         #     print("could not find nodes")
     print("src=", src, "dest=", dest)
-    print(type(src) ,src.__hash__())
-    print(src.get_name().__hash__())
+    # print(type(src) ,src.__hash__())
+    # print(src.get_name().__hash__())
     visited = False
     if not digraph.has_node(src) or not digraph.has_node(dest):
         raise ValueError("Nodes do not exist")
-    elif start == end:
+    elif src == dest:
         #update global variables
         print("src equal to dest")
         best_path = path[0]
         best_dist = path[1]
         return best_path, best_dist
     else:
+        print("edges for", src,"=", digraph.get_edges_for_node(src.__hash__()))
         for n in digraph.get_edges_for_node(src.__hash__()):
             visited = False
             for m in path[0]:
-                if n.get_destination().get_name() == m:
+                if n.get_source().get_name() == m:
                     visited = True
             if visited == False:
                 if path[0] == []:
@@ -197,7 +198,7 @@ def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
     node_list = []
     best_path = []
     path = [node_list, total_distance, outdoor_distance]
-    get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
+    best_path, best_dist = get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
                   best_path)
 
     return best_path, best_dist
