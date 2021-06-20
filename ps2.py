@@ -55,7 +55,8 @@ def load_map(map_filename):
             map_graph.add_node(dest_node)
             w_e = WeightedEdge(src_node, dest_node, parsed_line[2], parsed_line[3])
             map_graph.add_edge(w_e)
-    return print(map_graph)
+    # return print(map_graph)
+    return map_graph
 
 # Problem 2c: Testing load_map
 # Include the lines used to test load_map below, but comment them out
@@ -107,8 +108,58 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
         max_dist_outdoors constraints, then return None.
     """
     # TODO
-    pass
+    src = Node('a')
+    dest = Node('b')
+    for m in digraph.get_nodes():
+        # print("finding node:", m.get_name())
+        # print(digraph.get_nodes())
+        if src.get_name() == start and dest.get_name() == end:
+            break
+        if m.get_name() == start:
+            src = m
+        if m.get_name() == end:
+            dest = m               
+        # else:
+        #     # raise ValueError("Could not find nodes")
+        #     print("could not find nodes")
+    print("src=", src, "dest=", dest)
+    print(type(src) ,src.__hash__())
+    print(src.get_name().__hash__())
+    visited = False
+    if not digraph.has_node(src) or not digraph.has_node(dest):
+        raise ValueError("Nodes do not exist")
+    elif start == end:
+        #update global variables
+        print("src equal to dest")
+        best_path = path[0]
+        best_dist = path[1]
+        return best_path, best_dist
+    else:
+        for n in digraph.get_edges_for_node(src.__hash__()):
+            visited = False
+            for m in path[0]:
+                if n.get_destination().get_name() == m:
+                    visited = True
+            if visited == False:
+                if path[0] == []:
+                    path[0].append(src.get_name())  
+                else:
+                    path[0].append(n.get_destination().get_name())
+                    # for e in digraph.get_edges_for_node(n):
+                    # if e.get_destination() == n.get_destination()
+                    path[1] += int(n.get_total_distance())
+                    path[2] += int(n.get_outdoor_distance())
+                get_best_path(digraph, n.get_destination().get_name(), end, path, max_dist_outdoors, best_dist,
+                best_path)
+    if path[1] < best_dist and get_last_ele(path[0]) == dest.get_name():
+        best_path = path[0]
+        best_dist = path[1]
+    return best_path, best_dist
+    #TODO
+    # Problems: loops between buildings 32 and 36 (path 8->50)
 
+def get_last_ele(list):
+    return list[-1]
 
 # Problem 3c: Implement directed_dfs
 def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
@@ -140,8 +191,16 @@ def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
         max_dist_outdoors constraints, then raises a ValueError.
     """
     # TODO
-    pass
+    total_distance = 0
+    outdoor_distance = 0
+    best_dist = 9999
+    node_list = []
+    best_path = []
+    path = [node_list, total_distance, outdoor_distance]
+    get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
+                  best_path)
 
+    return best_path, best_dist
 
 # ================================================================
 # Begin tests -- you do not need to modify anything below this line

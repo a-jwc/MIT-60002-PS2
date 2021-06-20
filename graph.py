@@ -92,11 +92,11 @@ class Digraph(object):
 
     def add_node(self, node):
         """Adds a Node object to the Digraph. Raises a ValueError if it is
-        already in the graph.
-        if not self.has_node(node):
-            self.nodes.add(node)        
-        else:
-            raise ValueError("could not add node")"""
+        already in the graph."""
+        # if not self.has_node(node):
+        #     self.nodes.add(node)        
+        # else:
+        #     raise ValueError("could not add node")
         self.nodes.add(node)        
 
 
@@ -110,6 +110,9 @@ class Digraph(object):
             raise ValueError("could not add an edge")
         # print(edge.get_source().__hash__(), edge)
         # print("Edges in DG:", self.edges)
+    
+    def get_nodes(self):
+        return self.nodes
 
 def test_edges_nodes():
     node1 = Node('x')
@@ -118,6 +121,7 @@ def test_edges_nodes():
     graph = Digraph()
     graph.add_node(node1)
     graph.add_node(node2)
+    graph.add_node(node1)
     graph.add_edge(edge1)
 
     node3 = Node('z')
@@ -130,6 +134,7 @@ def test_edges_nodes():
     graph.add_edge(WeightedEdge(node3, node4, 4, 1))
 
     print(graph)
+    print(graph.get_nodes())
 # ================================================================
 # Begin tests -- you do not need to modify anything below this line
 # ================================================================
