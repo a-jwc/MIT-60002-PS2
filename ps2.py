@@ -155,6 +155,8 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
     if path[1] < best_dist and get_last_ele(path[0]) == dest.get_name():
         best_path = path[0]
         best_dist = path[1]
+    best_path = path[0]
+    best_dist = path[1]        
     return best_path, best_dist
     #TODO
     # Problems: loops between buildings 32 and 36 (path 8->50)
@@ -200,7 +202,8 @@ def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
     path = [node_list, total_distance, outdoor_distance]
     best_path, best_dist = get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
                   best_path)
-
+    if best_dist > max_total_dist:
+        raise ValueError("No path satisfies max total distance requirement")
     return best_path, best_dist
 
 # ================================================================
