@@ -8,6 +8,7 @@
 # Finding shortest paths through MIT buildings
 #
 import unittest
+import sys
 from graph import Digraph, Node, WeightedEdge
 
 #
@@ -22,6 +23,7 @@ from graph import Digraph, Node, WeightedEdge
 # Answer:
 #
 
+sys.setrecursionlimit(10**6)
 
 # Problem 2b: Implementing load_map
 def load_map(map_filename):
@@ -139,7 +141,7 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
         for n in digraph.get_edges_for_node(src.__hash__()):
             visited = False
             for m in path[0]:
-                if n.get_source().get_name() == m:
+                if n.get_destination().get_name() == m:
                     visited = True
             if visited == False:
                 if path[0] == []:
@@ -152,14 +154,22 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
                     path[2] += int(n.get_outdoor_distance())
                 get_best_path(digraph, n.get_destination().get_name(), end, path, max_dist_outdoors, best_dist,
                 best_path)
-    if path[1] < best_dist and get_last_ele(path[0]) == dest.get_name():
+    if path[1] < best_dist and get_last_ele(path[0]) == dest.get_name() and path[2] < max_dist_outdoors:
         best_path = path[0]
         best_dist = path[1]
-    best_path = path[0]
-    best_dist = path[1]        
+        # return best_path, best_dist
+    elif path[2] > max_dist_outdoors:
+        best_path = []
+        best_dist = 0
+    else:
+        path[0] = []
+        path[1] = 0
+        path[2] = 0
     return best_path, best_dist
-    #TODO
-    # Problems: loops between buildings 32 and 36 (path 8->50)
+
+
+    # best_path = path[0]
+    # best_dist = path[1]        
 
 def get_last_ele(list):
     return list[-1]
@@ -204,7 +214,7 @@ def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
                   best_path)
     if best_dist > max_total_dist:
         raise ValueError("No path satisfies max total distance requirement")
-    return best_path, best_dist
+    return best_path
 
 # ================================================================
 # Begin tests -- you do not need to modify anything below this line
