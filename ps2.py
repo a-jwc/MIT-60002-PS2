@@ -112,64 +112,53 @@ def get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
     # TODO
     src = Node('a')
     dest = Node('b')
+    # temp_path_list = []
     for m in digraph.get_nodes():
-        # print("finding node:", m.get_name())
-        # print(digraph.get_nodes())
         if src.get_name() == start and dest.get_name() == end:
             break
         if m.get_name() == start:
             src = m
         if m.get_name() == end:
-            dest = m               
-        # else:
-        #     # raise ValueError("Could not find nodes")
-        #     print("could not find nodes")
-    print("src=", src, "dest=", dest)
-    # print(type(src) ,src.__hash__())
-    # print(src.get_name().__hash__())
-    visited = False
+            dest = m
+
     if not digraph.has_node(src) or not digraph.has_node(dest):
-        raise ValueError("Nodes do not exist")
+        raise ValueError("Buildings", start, "or", end, "cannot be found.")
     elif src == dest:
-        #update global variables
-        print("src equal to dest")
-        best_path = path[0]
-        best_dist = path[1]
-        return best_path, best_dist
+        #  and path[0] != best_path and path[1] <= best_dist
+        print("elif")
+        if path[1] < best_dist and path[2] <= max_dist_outdoors:
+            best_path = path[0].copy()
+            best_dist = path[1]           
+            return best_path, best_dist    
     else:
-        print("edges for", src,"=", digraph.get_edges_for_node(src.__hash__()))
-        for n in digraph.get_edges_for_node(src.__hash__()):
+        for e in digraph.get_edges_for_node(src.__hash__()):
             visited = False
+            try:
+                last_ele = get_last_ele(path[0])
+            except:
+                last_ele = "0"
+            if last_ele == end or path[1] > best_dist or path[2] > max_dist_outdoors or int(e.get_outdoor_distance()) > max_dist_outdoors:
+                continue
+            if path[0] == []:
+                path[0].append(src.get_name())
+                visited = True  
             for m in path[0]:
-                if n.get_destination().get_name() == m:
+                if e.get_destination().get_name() == m:
                     visited = True
             if visited == False:
-                if path[0] == []:
-                    path[0].append(src.get_name())  
-                else:
-                    path[0].append(n.get_destination().get_name())
-                    # for e in digraph.get_edges_for_node(n):
-                    # if e.get_destination() == n.get_destination()
-                    path[1] += int(n.get_total_distance())
-                    path[2] += int(n.get_outdoor_distance())
-                get_best_path(digraph, n.get_destination().get_name(), end, path, max_dist_outdoors, best_dist,
-                best_path)
-    if path[1] < best_dist and get_last_ele(path[0]) == dest.get_name() and path[2] < max_dist_outdoors:
-        best_path = path[0]
-        best_dist = path[1]
-        # return best_path, best_dist
-    elif path[2] > max_dist_outdoors:
-        best_path = []
-        best_dist = 0
-    else:
-        path[0] = []
-        path[1] = 0
-        path[2] = 0
+                print(e)   
+                new_src = e.get_destination().get_name()
+                path[0].append(new_src)
+                path[1] += int(e.get_total_distance())
+                path[2] += int(e.get_outdoor_distance())
+                # if path[1] > best_dist or path[2] > max_dist_outdoors:
+                #     continue
+                best_path, best_dist = get_best_path(digraph, new_src, end, path, max_dist_outdoors, best_dist, best_path)
+                path[0].pop()
+                path[1] -= int(e.get_total_distance())
+                path[2] -= int(e.get_outdoor_distance()) 
+
     return best_path, best_dist
-
-
-    # best_path = path[0]
-    # best_dist = path[1]        
 
 def get_last_ele(list):
     return list[-1]
@@ -206,14 +195,16 @@ def directed_dfs(digraph, start, end, max_total_dist, max_dist_outdoors):
     # TODO
     total_distance = 0
     outdoor_distance = 0
-    best_dist = 9999
+    best_dist = 999999
     node_list = []
     best_path = []
     path = [node_list, total_distance, outdoor_distance]
     best_path, best_dist = get_best_path(digraph, start, end, path, max_dist_outdoors, best_dist,
                   best_path)
-    if best_dist > max_total_dist:
-        raise ValueError("No path satisfies max total distance requirement")
+    if best_dist >= max_total_dist or path[2] > max_dist_outdoors:
+        raise ValueError("No path satisfies max total distance or max outdoor distance requirement")
+    if best_path == []:
+        raise ValueError("There is no path for these buildings.")
     return best_path
 
 # ================================================================
